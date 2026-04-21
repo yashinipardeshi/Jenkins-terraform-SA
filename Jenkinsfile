@@ -45,7 +45,20 @@ pipeline {
                 sh 'terraform plan -out=tfplan'
             }
         }
-        
+        stage('Approval') {
+            steps {
+                input message: 'Review the Terraform Plan above. Do you want to Apply?',
+                      ok: 'Yes, Apply!',
+                      submitter: 'Yashini Pardeshi',
+                      parameters: [
+                          choice(
+                              name: 'ACTION',
+                              choices: ['Apply', 'Abort'],
+                              description: 'Choose Apply to proceed or Abort to cancel'
+                          )
+                      ]
+            }
+        }
         stage('Terraform Apply') {
             steps {
                 // Consider adding a manual approval gate here
