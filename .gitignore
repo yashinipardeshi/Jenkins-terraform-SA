@@ -20,3 +20,42 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+.override.tf
+*.tfstate
+*.tfstate.*
+crash.log
+backend.tf
+terraform.tfvars
+*.override
+
+# Module testing (delete before publish)
+test.tf
+plan.out
+tfplan*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+
+# Local env vars
+.env
+terraform.tfvars.local.terraform/
+*.tfstate
+*.tfstate.backup
