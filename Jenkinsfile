@@ -11,21 +11,28 @@ pipeline {
     
     stages {
         stage('Install Tools') {
-            steps {
-                sh '''
-                    sudo apt-get update
-                    sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
-                    
-                    # Install Azure CLI
-                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    steps {
+        sh '''
+            # Only install Terraform if not present
+            if ! command -v terraform &> /dev/null; then
+                echo "Installing Terraform..."
+                wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+                echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+                sudo apt-get update && sudo apt-get install -y terraform
+            else
+                echo "Terraform already installed: $(terraform version)"
+            fi
 
-                    # Install Terraform (Fixed GPG command)
-                    wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-                    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-                    sudo apt-get update && sudo apt-get install -y terraform
-                '''
-            }
-        }
+            # Only install Azure CLI if not present
+            if ! command -v az &> /dev/null; then
+                echo "Installing Azure CLI..."
+                curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            else
+                echo "Azure CLI already installed: $(az version --query '"azure-cli"' -o tsv)"
+            fi
+        '''
+    }
+}
 
         stage('Checkout') {
             steps {
